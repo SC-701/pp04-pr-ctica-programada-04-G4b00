@@ -18,6 +18,8 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: 'Production-Database'
 
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +33,8 @@ jobs:
         run: |
           dotnet nuget add source \
             "https://nuget.pkg.github.com/SC-701/index.json" \
-            --name "GitHub-SC701" \
-            --username G4b00 \
+            --name "Paquetes" \
+            --username "${{ github.actor }}" \
             --password "${{ secrets.PAQUETES_TOKEN }}" \
             --store-password-in-clear-text
 
