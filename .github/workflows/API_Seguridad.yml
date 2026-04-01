@@ -1,7 +1,7 @@
 name: Deploy Seguridad API to Azure
 
 env:
-  AZURE_WEBAPP_NAME:         seguridad-api-sc701
+  AZURE_WEBAPP_NAME:         SeguridadAPI
   AZURE_WEBAPP_PACKAGE_PATH: './Seguridad/Seguridad.API'
   DOTNET_VERSION:            '8.0'
 
@@ -31,8 +31,8 @@ jobs:
         run: |
           dotnet nuget add source \
             "https://nuget.pkg.github.com/SC-701/index.json" \
-            --name "Paquetes" \
-            --username "${{ github.actor }}" \
+            --name "GitHub-SC701" \
+            --username G4b00 \
             --password "${{ secrets.PAQUETES_TOKEN }}" \
             --store-password-in-clear-text
 
