@@ -1,0 +1,469 @@
+﻿@page "{id:guid}"
+@model Web.Pages.Vehiculos.EliminarModel
+@{
+    ViewData["Title"] = "Eliminar Vehículo";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0b0c0e;
+            --surface: #111316;
+            --surface2: #1a1d22;
+            --border: #2a2d35;
+            --accent: #e8ff47;
+            --accent-dim: rgba(232, 255, 71, 0.10);
+            --text: #f0f2f5;
+            --text-muted: #6b7280;
+            --text-dim: #9ca3af;
+            --danger: #ff4d4d;
+            --danger-dim: rgba(255, 77, 77, 0.10);
+            --danger-glow: rgba(255, 77, 77, 0.25);
+            --info: #38bdf8;
+            --info-dim: rgba(56, 189, 248, 0.10);
+            --radius: 10px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            border-bottom: 1px solid var(--border);
+            padding: 28px 48px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            background: rgba(11, 12, 14, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
+            white-space: nowrap;
+        }
+
+            .back-btn:hover {
+                color: var(--text);
+                border-color: var(--text-muted);
+                background: var(--surface2);
+            }
+
+        .header-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        .header-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .breadcrumb {
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+            .page-title span {
+                color: var(--danger);
+            }
+
+        /* ── Main ── */
+        .main-content {
+            padding: 40px 48px;
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ── Warning banner ── */
+        .warning-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--danger-dim);
+            border: 1px solid rgba(255, 77, 77, 0.25);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+        }
+
+        .warning-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .warning-text h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--danger);
+            margin-bottom: 4px;
+        }
+
+        .warning-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ── Info card ── */
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+        }
+
+        .vehicle-name {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .vehicle-brand {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .vehicle-model-name {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .placa-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--accent-dim);
+            border: 1px solid rgba(232, 255, 71, 0.3);
+            color: var(--accent);
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            padding: 6px 16px;
+            border-radius: 8px;
+        }
+
+        .info-body {
+            padding: 8px 0;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 28px;
+            border-bottom: 1px solid rgba(42, 45, 53, 0.5);
+            gap: 16px;
+        }
+
+            .field-row:last-child {
+                border-bottom: none;
+            }
+
+        .field-label {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .field-value {
+            font-size: 13px;
+            color: var(--text);
+            text-align: right;
+        }
+
+            .field-value.highlight {
+                font-family: 'Syne', sans-serif;
+                font-weight: 700;
+                color: var(--accent);
+            }
+
+        .color-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .color-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--info);
+            box-shadow: 0 0 6px var(--info);
+        }
+
+        /* ── Form actions ── */
+        .actions-card {
+            background: var(--surface);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: 14px;
+            padding: 24px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .actions-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 340px;
+        }
+
+            .actions-text strong {
+                color: var(--text-dim);
+                display: block;
+                font-family: 'Syne', sans-serif;
+                font-size: 13px;
+                margin-bottom: 4px;
+            }
+
+        .actions-btns {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            padding: 11px 22px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+            .btn-cancel:hover {
+                background: var(--border);
+                color: var(--text);
+            }
+
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--danger);
+            border: none;
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.04em;
+            padding: 11px 24px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+        }
+
+            .btn-delete:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px var(--danger-glow);
+            }
+
+            .btn-delete:active {
+                transform: translateY(0);
+            }
+
+        /* ── Responsive ── */
+        @@media (max-width: 650px) {
+            .page-header {
+                padding: 18px 20px;
+            }
+
+            .main-content {
+                padding: 24px 16px;
+            }
+
+            .info-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .field-row {
+                padding: 13px 20px;
+            }
+
+            .actions-card {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 20px;
+            }
+
+            .actions-btns {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="page-header">
+        <a href="/Vehiculos" class="back-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Volver
+        </a>
+        <div class="header-divider"></div>
+        <div class="header-meta">
+            <span class="breadcrumb">Vehículos / Eliminar</span>
+            <h1 class="page-title">Eliminar <span>Vehículo</span></h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        @if (Model.vehiculo == null)
+        {
+            <div style="text-align:center; padding: 80px 24px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 16px;">
+                <div style="font-size:48px; margin-bottom:16px;">🔍</div>
+                <p style="font-family:'Syne',sans-serif; font-size:18px; color:var(--text-dim);">Vehículo no encontrado</p>
+            </div>
+        }
+        else
+        {
+            <!-- Warning -->
+            <div class="warning-banner">
+                <span class="warning-icon">⚠️</span>
+                <div class="warning-text">
+                    <h3>Acción irreversible</h3>
+                    <p>Estás a punto de eliminar este vehículo del sistema. Esta acción no se puede deshacer.</p>
+                </div>
+            </div>
+
+            <!-- Info del vehículo -->
+            <div class="info-card">
+                <div class="info-card-header">
+                    <div class="vehicle-name">
+                        <span class="vehicle-brand">@Model.vehiculo.Marca</span>
+                        <span class="vehicle-model-name">@Model.vehiculo.Modelo &middot; @Model.vehiculo.Anio</span>
+                    </div>
+                    <span class="placa-badge">@Model.vehiculo.Placa</span>
+                </div>
+                <div class="info-body">
+                    <div class="field-row">
+                        <span class="field-label">Color</span>
+                        <span class="field-value">
+                            <span class="color-pill">
+                                <span class="color-dot"></span>
+                                @Model.vehiculo.Color
+                            </span>
+                        </span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Precio</span>
+                        <span class="field-value highlight">₡ @Model.vehiculo.Precio.ToString("N0")</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Correo</span>
+                        <span class="field-value">@Model.vehiculo.CorreoPropietario</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Teléfono</span>
+                        <span class="field-value">@Model.vehiculo.TelefonoPropietario</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">ID</span>
+                        <span class="field-value" style="font-size:11px; color:var(--text-muted);">@Model.vehiculo.Id</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <form method="post" asp-route-id="@Model.vehiculo.Id">
+                @Html.AntiForgeryToken()
+                <div class="actions-card">
+                    <div class="actions-text">
+                        <strong>¿Confirmas la eliminación?</strong>
+                        Al presionar "Eliminar", el vehículo con placa <strong style="color:var(--accent)">@Model.vehiculo.Placa</strong> será removido permanentemente.
+                    </div>
+                    <div class="actions-btns">
+                        <a href="/Vehiculos" class="btn-cancel">Cancelar</a>
+                        <button type="submit" class="btn-delete">
+                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                                <path d="M2 3.5h9M5 3.5V2.5h3v1M3.5 3.5l.5 7h5l.5-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        }
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,715 @@
+﻿@page
+@model Web.Pages.Vehiculos.IndexModel
+@{
+    ViewData["Title"] = "Vehículos";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0b0c0e;
+            --surface: #111316;
+            --surface2: #1a1d22;
+            --border: #2a2d35;
+            --accent: #e8ff47;
+            --accent-dim: rgba(232, 255, 71, 0.12);
+            --accent-glow: rgba(232, 255, 71, 0.25);
+            --text: #f0f2f5;
+            --text-muted: #6b7280;
+            --text-dim: #9ca3af;
+            --danger: #ff4d4d;
+            --danger-dim: rgba(255, 77, 77, 0.12);
+            --info: #38bdf8;
+            --info-dim: rgba(56, 189, 248, 0.12);
+            --edit: #a78bfa;
+            --edit-dim: rgba(167, 139, 250, 0.12);
+            --radius: 10px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            border-bottom: 1px solid var(--border);
+            padding: 32px 48px 28px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            position: sticky;
+            top: 0;
+            background: rgba(11, 12, 14, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .breadcrumb {
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: var(--text);
+        }
+
+            .page-title span {
+                color: var(--accent);
+            }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: #0b0c0e;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.04em;
+            padding: 11px 22px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+            white-space: nowrap;
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px var(--accent-glow);
+            }
+
+            .btn-add svg {
+                flex-shrink: 0;
+            }
+
+        /* ── Stats bar ── */
+        .stats-bar {
+            display: flex;
+            gap: 1px;
+            background: var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-chip {
+            flex: 1;
+            background: var(--surface);
+            padding: 16px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+            .stat-value.accent {
+                color: var(--accent);
+            }
+
+        /* ── Main ── */
+        .main-content {
+            padding: 40px 48px;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+            border: 1px dashed var(--border);
+            border-radius: 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            filter: grayscale(1) opacity(0.4);
+        }
+
+        .empty-state h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        /* ── Table ── */
+        .table-wrapper {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Syne', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 14px 20px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+            tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            tbody tr:hover {
+                background: var(--surface2);
+            }
+
+        td {
+            padding: 16px 20px;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        /* ── Placa badge ── */
+        .placa-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--accent-dim);
+            border: 1px solid rgba(232, 255, 71, 0.3);
+            color: var(--accent);
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 5px 12px;
+            border-radius: 6px;
+        }
+
+        /* ── Marca / Modelo ── */
+        .vehicle-model {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .vehicle-brand {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .vehicle-model-name {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ── Color dot ── */
+        .color-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--info);
+            flex-shrink: 0;
+            box-shadow: 0 0 6px var(--info);
+        }
+
+        /* ── Price ── */
+        .price {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .price-symbol {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-right: 2px;
+        }
+
+        /* ── Actions ── */
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 7px 12px;
+            border-radius: 7px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+            white-space: nowrap;
+        }
+
+            .btn-action:hover {
+                transform: translateY(-1px);
+            }
+
+            .btn-action:active {
+                transform: translateY(0);
+            }
+
+        .btn-details {
+            background: var(--info-dim);
+            border-color: rgba(56, 189, 248, 0.25);
+            color: var(--info);
+        }
+
+            .btn-details:hover {
+                background: rgba(56, 189, 248, 0.2);
+                box-shadow: 0 4px 14px rgba(56, 189, 248, 0.15);
+            }
+
+        .btn-edit {
+            background: var(--edit-dim);
+            border-color: rgba(167, 139, 250, 0.25);
+            color: var(--edit);
+        }
+
+            .btn-edit:hover {
+                background: rgba(167, 139, 250, 0.2);
+                box-shadow: 0 4px 14px rgba(167, 139, 250, 0.15);
+            }
+
+        .btn-delete {
+            background: var(--danger-dim);
+            border-color: rgba(255, 77, 77, 0.25);
+            color: var(--danger);
+        }
+
+            .btn-delete:hover {
+                background: rgba(255, 77, 77, 0.2);
+                box-shadow: 0 4px 14px rgba(255, 77, 77, 0.15);
+            }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 440px;
+            animation: modal-in 0.2s ease;
+        }
+
+        @@keyframes modal-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .modal-body {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+            .modal-body strong {
+                color: var(--danger);
+            }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal-cancel {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+            .btn-modal-cancel:hover {
+                background: var(--border);
+            }
+
+        .btn-modal-confirm {
+            background: var(--danger);
+            border: none;
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.15s;
+        }
+
+            .btn-modal-confirm:hover {
+                opacity: 0.88;
+                transform: translateY(-1px);
+            }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            color: var(--text);
+            font-size: 13px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            z-index: 9999;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            pointer-events: none;
+        }
+
+            .toast.show {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+        /* ── Responsive ── */
+        @@media (max-width: 900px) {
+            .page-header {
+                padding: 20px 20px 16px;
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .main-content {
+                padding: 24px 16px;
+            }
+
+            .stats-bar {
+                overflow-x: auto;
+            }
+
+            .stat-chip {
+                min-width: 140px;
+                padding: 14px 20px;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 750px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="page-header">
+        <div class="header-left">
+            <span class="breadcrumb">Panel / Inventario</span>
+            <h1 class="page-title">Vehícu<span>los</span></h1>
+        </div>
+        <a href="/Vehiculos/Crear" class="btn-add">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Agregar Vehículo
+        </a>
+    </header>
+
+    <!-- Stats -->
+    @if (Model.Vehiculos != null)
+    {
+        <div class="stats-bar">
+            <div class="stat-chip">
+                <span class="stat-label">Total vehículos</span>
+                <span class="stat-value accent">@Model.Vehiculos.Count</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-label">Precio promedio</span>
+                <span class="stat-value">
+                    @if (Model.Vehiculos.Any())
+                    {
+                        @("₡" + Model.Vehiculos.Average(v => v.Precio).ToString("N0"))
+                    }
+                    else
+                    {
+                        @("₡0")
+                    }
+                </span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-label">Precio más alto</span>
+                <span class="stat-value">
+                    @if (Model.Vehiculos.Any())
+                    {
+                        @("₡" + Model.Vehiculos.Max(v => v.Precio).ToString("N0"))
+                    }
+                    else
+                    {
+                        @("₡0")
+                    }
+                </span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-label">Marcas distintas</span>
+                <span class="stat-value">@(Model.Vehiculos.Select(v => v.Marca).Distinct().Count())</span>
+            </div>
+        </div>
+    }
+
+    <!-- Main -->
+    <main class="main-content">
+
+        @if (Model.Vehiculos == null || !Model.Vehiculos.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">🚗</div>
+                <h3>Sin vehículos registrados</h3>
+                <p>Agrega el primero usando el botón superior.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Vehículo</th>
+                            <th>Año</th>
+                            <th>Color</th>
+                            <th>Precio</th>
+                            <th>Propietario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var vehiculo in Model.Vehiculos)
+                        {
+                            <tr>
+                                <td><span class="placa-badge">@vehiculo.Placa</span></td>
+                                <td>
+                                    <div class="vehicle-model">
+                                        <span class="vehicle-brand">@vehiculo.Marca</span>
+                                        <span class="vehicle-model-name">@vehiculo.Modelo</span>
+                                    </div>
+                                </td>
+                                <td>@vehiculo.Anio</td>
+                                <td>
+                                    <div class="color-cell">
+                                        <span class="color-dot"></span>
+                                        @vehiculo.Color
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="price">
+                                        <span class="price-symbol">₡</span>@vehiculo.Precio.ToString("N0")
+                                    </span>
+                                </td>
+                                <td style="color: var(--text-muted); font-size: 12px;">
+                                    @vehiculo.CorreoPropietario
+                                </td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <a href="/Vehiculos/Detalles/@vehiculo.Id" class="btn-action btn-details">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                                <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5" />
+                                                <path d="M6 5.5V8.5M6 3.5V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            </svg>
+                                            Detalles
+                                        </a>
+                                        <a href="/Vehiculos/Editar/@vehiculo.Id" class="btn-action btn-edit">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                                <path d="M8.5 1.5 a1.5 1.5 0 0 1 2.12 2.12L4 10.25l-2.75.5.5-2.75Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+                                            </svg>
+                                            Editar
+                                        </a>
+                                        <a href="/Vehiculos/Eliminar/@vehiculo.Id" class="btn-action btn-delete">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                                <path d="M2 3h8M5 3V2h2v1M3 3l.5 7h5L9 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </main>
+
+    <!-- Modal de confirmación -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <h2 class="modal-title">Eliminar vehículo</h2>
+            <p class="modal-body" id="deleteModalBody">
+                ¿Estás seguro de que deseas eliminar este vehículo?
+            </p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-modal-confirm" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let vehiculoIdPendiente = null;
+
+        function confirmarEliminar(id, placa, nombre) {
+            vehiculoIdPendiente = id;
+            document.getElementById('deleteModalBody').innerHTML =
+                `¿Seguro que deseas eliminar el vehículo <strong>${nombre}</strong> con placa <strong>${placa}</strong>? Esta acción no se puede deshacer.`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            vehiculoIdPendiente = null;
+        }
+
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) cerrarModal();
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
+            if (!vehiculoIdPendiente) return;
+            try {
+                const res = await fetch(`/Vehiculos/Eliminar/${vehiculoIdPendiente}`, {
+                    method: 'DELETE',
+                    headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '' }
+                });
+                cerrarModal();
+                if (res.ok) {
+                    mostrarToast('Vehículo eliminado correctamente.');
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    mostrarToast('Error al eliminar el vehículo.');
+                }
+            } catch {
+                cerrarModal();
+                mostrarToast('Error de conexión.');
+            }
+        });
+
+        function mostrarToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+
+</body>
+</html>
